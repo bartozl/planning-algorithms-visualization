@@ -58,15 +58,17 @@ class world:
                 self.goal = None  # deleting a goal
 
         elif cell_type == 'source':
-            if self.source is not None:
+            if self.source is None and grid[x][y] not in [2, 3]:  # don't put a source on wall(2) or goal(3)
+                self.source = grid[x][y]
                 value = 1
 
-        elif cell_type == 'wall':  # don't put a wall on source or goal
-            if grid[x][y] not in [1, 3]:
+        elif cell_type == 'wall':
+            if grid[x][y] not in [1, 3]:  # don't put a wall on source(1) or goal(3)
                 value = 2
 
         elif cell_type == 'goal':
-            if self.goal is not None:
+            if self.goal is None and grid[x][y] not in [1, 2]:  # don't put a goal on source(1) or wall(2)
+                self.goal = grid[x][y]
                 value = 3
 
         elif cell_type == 'frontier':
@@ -86,7 +88,7 @@ class world:
             if grid[x][y] == 3:
                 value = 3
 
-        if cell_type is not None:
+        if cell_type is not None and value is not None:
             grid[x][y] = value
 
     def draw(self, screen, grid):
@@ -218,7 +220,7 @@ class world:
                     if event.button == self.control["LEFT_CLICK"]:
                         if self.source is None:
                             cell_type = 'source'
-                            self.source = np.asarray(event.pos)[::-1] // (self.PIXELS + self.MARGIN)
+                            # self.source = np.asarray(event.pos)[::-1] // (self.PIXELS + self.MARGIN)
 
                     # add a wall cell
                     if event.button == self.control["MIDDLE_CLICK"]:
@@ -229,7 +231,7 @@ class world:
                     if event.button == self.control["RIGHT_CLICK"]:
                         if self.goal is None:
                             cell_type = 'goal'
-                            self.goal = np.asarray(event.pos)[::-1] // (self.PIXELS + self.MARGIN)
+                            # self.goal = np.asarray(event.pos)[::-1] // (self.PIXELS + self.MARGIN)
 
                     # update both the current and the previous grid
                     pos = np.asarray(event.pos)[::-1] // (self.PIXELS + self.MARGIN)
