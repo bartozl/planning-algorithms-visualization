@@ -17,7 +17,7 @@ def path_length(path):
     length = 0
     for i in range(len(path) - 1):
         length += dist(path[i], path[i + 1])
-    return length
+    return np.round(length, 4)
 
 
 def heuristic(grid, goal, metric='euclidean'):
@@ -63,3 +63,19 @@ def post_smoothing(come_from, wall):
     k += 1
     path.append(come_from[-1])
     return path
+
+
+def build_print_line(algorithm, steps, paths, run_num, printed_infos):
+    length = path_length(paths[-1][0])
+    print_this = "  {:3s} | {:16s} |   {:5s} | {:5s}" \
+        .format(str(run_num), algorithm, str(steps), str(length))
+    infos = {'run': run_num,
+             'algo': algorithm,
+             'steps': steps,
+             'length': length}
+
+    if infos not in printed_infos:
+        printed_infos.append(infos)
+        print(print_this)
+    return print_this, printed_infos
+    # self.caption = self.print_this

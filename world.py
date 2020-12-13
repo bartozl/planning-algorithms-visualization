@@ -1,77 +1,94 @@
 import sys
+from collections import defaultdict
 
 import numpy as np
 import pygame
 
 from algorithms import A_star, Dijkstra, greed_best_first, Theta_star
-from utils import heuristic, post_smoothing, path_length
+from utils import heuristic, post_smoothing, build_print_line
 
 
 class world:
 
     def __init__(self, height=20, width=20, margin=1, pixels=800, step_by_step=False, update_speed=45):
-        self.print_this = ''
+
+        self.world_is_changed = True  # keep track of updates in start, goal or wall cells
+        self.run_num = 0  # identify the run number
+        self.print_this = ''  # print infos about [run][algo][steps][distance]
+        self.printed_infos = []  # for each run, save results of each algorithms.
+        self.step_by_step = step_by_step  # allows step by step execution of the algorithm
+        self.best_algo_dict = defaultdict(int)
+        self.algorithm_runs = defaultdict(int)  # keep track of number of runs with a spec. algorithm
+        self.applied_this_run = defaultdict(bool)
+
+        # pygame
         self.screen = None
         self.update_speed = update_speed if step_by_step is False else -1
         self.clock = pygame.time.Clock()
-        self.step_by_step = step_by_step
-        self.H = height
-        self.W = width
-        self.MARGIN = margin
-        self.PIXELS = pixels // height
-        self.WINDOW_SIZE = [self.PIXELS * self.W + self.MARGIN * self.W + self.MARGIN,
-                            self.PIXELS * self.H + self.MARGIN * self.H + self.MARGIN]
-
         self.caption = 'environment'
 
-        self.control = {"LEFT_CLICK": 1, "MIDDLE_CLICK": 2, "RIGHT_CLICK": 3,
-                        "ENTER": 13, "CTRL": 306, "SHIFT": 304, "SPACE": 32,
-                        "A": 97, "D": 100, "G": 103, "P": 112,
-                        "Q": 113, "R": 114, "S": 115, "T": 116}
-
+        # initialize the world
+        self.H, self.W, self.MARGIN, self.PIXELS = height, width, margin, pixels // height
+        self.WINDOW_SIZE = [self.PIXELS * self.W + self.MARGIN * self.W + self.MARGIN,
+                            self.PIXELS * self.H + self.MARGIN * self.H + self.MARGIN]
+        self.clean_grid = np.zeros([self.H, self.W], dtype=np.int8)
+        self.curr_grid = self.clean_grid.copy()
         self.goal = None
         self.start = None
         self.paths = []  # list of paths (e.g. path[0] found by A*, path[1] found by GBF exc.)
         self.wall = []  # list of wall cells
 
-        # color used for cells and paths
+        # utilities
+        self.control = {"LEFT_CLICK": 1, "MIDDLE_CLICK": 2, "RIGHT_CLICK": 3,
+                        "ENTER": 13, "CTRL": 306, "SHIFT": 304, "SPACE": 32,
+                        "A": 97, "D": 100, "G": 103, "P": 112,
+                        "Q": 113, "R": 114, "S": 115, "T": 116}
         self.color = {"SHADOW": (192, 192, 192), "WHITE": (255, 255, 255), "LIGHTGREEN": (0, 255, 0),
                       "GREEN": (35, 250, 44), "BLUE": (0, 0, 128), "LIGHTBLUE": (0, 0, 255),
                       "RED": (220, 0, 0), "LIGHTRED": (255, 100, 100), "PURPLE": (102, 0, 102),
                       "LIGHTPURPLE": (153, 0, 153), "BLACK": (0, 0, 0), "YELLOW": (245, 255, 137)}
 
-    def update_grid(self, grid, cell_type, pos):
+    def update_grid(self, cell_type, pos, clean_grid=False):
         """
-        :param grid: the cell grid
+        :param clean_grid: if true update the clean grid else the current grid
         :param cell_type: "clean", "source", "wall", "goal", "frontier", "inner", "path",
         :param pos: cell that should be updated
         :return: nothing. Update the grid by changing the color of the cell "pos" w.r.t. the cell_type value
         """
+        if clean_grid:
+            grid = self.clean_grid
+        else:
+            grid = self.curr_grid
         x, y = pos  # pos = (x,y) = (h, w)
         value = None
-
         if cell_type == 'clean':
             value = 0
             if grid[x][y] == 1:
                 self.start = None  # deleting a source
+                self.world_is_changed = True
             elif grid[x][y] == 2:
                 self.wall = [cell for cell in self.wall if cell != (x, y)]
+                self.world_is_changed = True
             elif grid[x][y] == 3:
                 self.goal = None  # deleting a goal
+                self.world_is_changed = True
 
         elif cell_type == 'source':
             if self.start is None and grid[x][y] not in [2, 3]:  # don't put a source on wall(2) or goal(3)
                 self.start = (x, y)
+                self.world_is_changed = True
                 value = 1
 
         elif cell_type == 'wall':
             if grid[x][y] not in [1, 3]:  # don't put a wall on source(1) or goal(3)
                 self.wall.append((x, y))
+                self.world_is_changed = True
                 value = 2
 
         elif cell_type == 'goal':
             if self.goal is None and grid[x][y] not in [1, 2]:  # don't put a goal on source(1) or wall(2)
                 self.goal = (x, y)
+                self.world_is_changed = True
                 value = 3
 
         elif cell_type == 'frontier':
@@ -94,9 +111,14 @@ class world:
         if cell_type is not None and value is not None:
             grid[x][y] = value
 
-    def draw(self, grid):
+        if clean_grid:
+            self.clean_grid = grid
+        else:
+            self.curr_grid = grid
+
+    def draw(self):
         x, y = self.MARGIN, self.MARGIN
-        for row in grid:
+        for row in self.curr_grid:
             for elem in row:
                 color = self.color['WHITE']
                 if elem == 1:
@@ -116,9 +138,6 @@ class world:
                 x += self.PIXELS + self.MARGIN
             y += self.PIXELS + self.MARGIN
             x = self.MARGIN
-
-        pygame.display.set_caption(self.caption)
-
         self.draw_path()
 
     def draw_path(self):
@@ -128,21 +147,89 @@ class world:
             pointlist = np.asarray([pos[::-1] for pos in path]) * (self.MARGIN + self.PIXELS) + (self.PIXELS / 2)
             pygame.draw.lines(self.screen, color, closed, pointlist, width)
 
-    def reset_world(self):
-        if len(self.paths) != 0:  # separate prints of different runs
-            print('* ' * (len(self.print_this) // 2))
-        self.caption = 'environment'
-        self.goal = None
-        self.start = None
-        self.paths = []
-        self.wall = []
-        clean_grid = np.zeros([self.H, self.W], dtype=np.int8)
-        return clean_grid
+    def best_run(self, ever=False):
+        if not ever:
+            min_length = np.inf
+            min_steps = np.inf
+            best_algo = [(None, np.inf)]
+            for run in self.printed_infos:
+                if run['run'] != self.run_num or run['length'] > min_length:
+                    continue
+                # a shorter path has been found
+                if run['length'] < min_length:
+                    best_algo = [(run['algo'], run['steps'])]
+                    min_length = run['length']
+                    min_steps = run['steps']
+                # a path equal to the shorter one has been found
+                elif run['length'] == min_length:
+                    # in the same number of steps --> add the algo to the list of the bests
+                    if run['steps'] == best_algo[0][1]:
+                        best_algo.append((run['algo'], run['steps']))
+                    # in a lower number of steps --> reinitialize the list of the best with the new one
+                    if run['steps'] < best_algo[0][1]:
+                        best_algo = [(run['algo'], run['steps'])]
+                        min_steps = run['steps']
+            best_algo_list = [x[0] for x in list(dict.fromkeys(best_algo))]
+            for algo in best_algo_list:
+                self.best_algo_dict[algo] += 1
+            best_algo = ', '.join(best_algo_list)
+            return " *Best* --> length {} found in {} steps by {}".format(min_length, min_steps, best_algo)
+        else:
+            string = ''
+            for algo in self.algorithm_runs:
+                string += " {:16s} |  {:5s}% | {:.1f}% \n" \
+                          .format(algo,
+                                  str(np.round(100 * self.algorithm_runs[algo] / self.run_num, 1)),
+                                  100 * self.best_algo_dict[algo] / self.algorithm_runs[algo])
+            return string
 
-    def set_the_env(self, clean_grid):
+    def reset_world(self, mode, new_run=False, keep_paths=False):
+        # soft reset: start, goal and walls and run_num and paths are kept (called when R is pressed)
+        # middle: start, goal, walls and run_num are kept (when a new algo in computed)
+        if mode == 'soft':
+            self.curr_grid = self.clean_grid
+            if not keep_paths:
+                self.paths = []
+            # if goal, start, wall have been changed, it counts as a new run
+            if self.world_is_changed and new_run:
+                if len(self.print_this) > 0:
+                    print(self.best_run())
+                print('* ' * (len(self.print_this) // 2))
+                print(' {:4s} | {:16s} |  {:6s} | {:6s}'.format('RUN', 'ALGORITHM', 'STEPS', 'LENGTH'))
+                self.paths = []
+                self.run_num += 1
+                self.applied_this_run = defaultdict(bool)
+                #
+
+            self.world_is_changed = False
+
+        # hard reset: complete reset of the environment (called when Q is pressed)
+        elif mode == 'hard':
+            if len(self.printed_infos) > 0:
+                print(self.best_run())
+                print('* ' * (len(self.print_this) // 2))
+                print(' {:16s} |   {:4s}  | {:5s}'.format('ALGORITHM', 'USE', 'BEST'))
+                print(self.best_run(ever=True))
+                print('* ' * (len(self.print_this) // 2))
+                # print(' {:4s} | {:16s} |  {:6s} | {:6s}'.format('RUN', 'ALGORITHM', 'STEPS', 'LENGTH'))
+            self.algorithm_runs = defaultdict(int)
+            self.best_algo_dict = defaultdict(int)
+            self.applied_this_run = defaultdict(bool)
+            self.print_this = ""
+            self.printed_infos = []
+            self.world_is_changed = False
+            self.run_num = 0
+            self.caption = 'environment'
+            self.goal = None
+            self.start = None
+            self.paths = []
+            self.wall = []
+            self.clean_grid = np.zeros([self.H, self.W], dtype=np.int8)
+            self.curr_grid = self.clean_grid
+
+    def set_the_env(self):
         drag = False  # flag used for wall-cells creation and cells cleaning
         clean = False  # flag used for cleaning the entire grid
-        curr_grid = clean_grid.copy()  # the actual grid.
         # The clean_grid stores only source, goal and walls cells. Useful for cleaning
         while True:
             # capture the pygame events
@@ -157,55 +244,51 @@ class world:
                     # CTRL released: end of cleaning phase
                     if event.key == self.control["CTRL"]:
                         clean = False
+                        # self.reset_world('soft')
 
                     # SHIFT released: end of walls drawing phase
                     if event.key == self.control["SHIFT"]:
                         drag = False
+                        # self.reset_world('soft')
 
                     # A, D, P, G, T, S released: apply the selected algorithm
                     if event.key == self.control["A"]:
-                        curr_grid = self.algorithm(self.screen, clean_grid, 'A_star', self.color["RED"])
+                        self.algorithm('A_star', self.color["RED"])
                     if event.key == self.control["D"]:
-                        curr_grid = self.algorithm(self.screen, clean_grid, 'Dijkstra', self.color["YELLOW"])
+                        self.algorithm('Dijkstra', self.color["YELLOW"])
                     if event.key == self.control["P"]:
-                        curr_grid = self.algorithm(self.screen, clean_grid, 'A_star_PS', self.color["PURPLE"])
+                        self.algorithm('A_star_PS', self.color["PURPLE"])
                     if event.key == self.control["G"]:
-                        curr_grid = self.algorithm(self.screen, clean_grid, 'greed_best_first', self.color["BLUE"])
+                        self.algorithm('greed_best_first', self.color["BLUE"])
                     if event.key == self.control["T"]:
-                        curr_grid = self.algorithm(self.screen, clean_grid, 'Theta_star', self.color["GREEN"])
+                        self.algorithm('Theta_star', self.color["GREEN"])
                     if event.key == self.control["S"]:
-                        curr_grid.image.save(self.screen, '{}.png'.format(self.caption))
+                        pygame.image.save(self.screen, '{}.png'.format(self.caption))
 
                 # when a key in the keyboard is pressed
                 if event.type == pygame.KEYDOWN:
                     # CTRL pressed: start of cleaning phase
                     if event.key == self.control["CTRL"]:
                         clean = True
+                        self.reset_world('soft')
 
                     # SHIFT pressed: allow wall creation phase
                     if event.key == self.control["SHIFT"]:
                         drag = True
-                        if len(self.paths) != 0:  # separate prints of different runs
-                            print('* ' * (len(self.print_this) // 2))
-                        self.paths = []  # clean the already drawn paths
-                        curr_grid = clean_grid  # clean the colored cells
+                        self.reset_world('soft')
 
                     # R released: restart the scenario keeping the source, goal and walls
                     if event.key == self.control["R"]:
-                        if len(self.paths) != 0:  # separate prints of different runs
-                            print('* ' * (len(self.print_this) // 2))
-                        curr_grid = clean_grid
-                        self.paths = []
+                        self.reset_world('soft')
 
                     # Q released: restart the scenario from scratch
                     if event.key == self.control["Q"]:
-                        clean_grid = self.reset_world()
-                        curr_grid = clean_grid
+                        self.reset_world('hard')
 
                 # when a mouse button is pressed
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button in [self.control["LEFT_CLICK"], self.control["RIGHT_CLICK"]]:
-                        curr_grid = clean_grid
+                        self.curr_grid = self.clean_grid
                     # middle click pressed: allow walls creations by moving the mouse
                     if event.button == self.control["MIDDLE_CLICK"]:
                         drag = True
@@ -221,8 +304,8 @@ class world:
                     if cell_type is not None:
                         # update both the current and the previous grid
                         pos = np.asarray(event.pos)[::-1] // (self.PIXELS + self.MARGIN)
-                        self.update_grid(clean_grid, cell_type, pos)
-                        self.update_grid(curr_grid, cell_type, pos)
+                        self.update_grid(cell_type, pos, clean_grid=True)  # update the clean_grid
+                        self.update_grid(cell_type, pos, clean_grid=False)  # update the current grid
 
                 # when a mouse button is released
                 if event.type == pygame.MOUSEBUTTONUP:
@@ -242,45 +325,45 @@ class world:
                     if event.button == self.control["RIGHT_CLICK"]:
                         if self.goal is None:
                             cell_type = 'goal'
-                            # self.goal = np.asarray(event.pos)[::-1] // (self.PIXELS + self.MARGIN)
 
                     # update both the current and the previous grid
                     pos = np.asarray(event.pos)[::-1] // (self.PIXELS + self.MARGIN)
-                    self.update_grid(curr_grid, cell_type, pos)
-                    self.update_grid(clean_grid, cell_type, pos)
+                    self.update_grid(cell_type, pos, clean_grid=False)  # update the clean_grid
+                    self.update_grid(cell_type, pos, clean_grid=True)  # update the current grid
 
-            self.screen.fill(self.color['BLACK'])
-            self.draw(curr_grid)
-            pygame.display.flip()
+            self.update_screen()
 
-    def step(self, data_algo, algorithm, curr_grid, color):
+    def update_screen(self):
+        self.screen.fill(self.color['BLACK'])
+        self.draw()
+        pygame.display.set_caption(self.caption)
+        pygame.display.flip()
+        self.clock.tick(self.update_speed)
+
+    def step(self, data_algo, algorithm, color):
         done = False
         if (algorithm is 'A_star') or (algorithm is 'A_star_PS'):
-            data_algo['frontier'], data_algo['inner'], data_algo['g_score'], data_algo['come_from'] = A_star(curr_grid,
-                                                                                                             self.wall,
-                                                                                                             self.goal,
-                                                                                                             data_algo[
-                                                                                                                 'h'],
-                                                                                                             data_algo[
-                                                                                                                 'frontier'],
-                                                                                                             data_algo[
-                                                                                                                 'inner'],
-                                                                                                             data_algo[
-                                                                                                                 'g_score'],
-                                                                                                             data_algo[
-                                                                                                                 'f_score'],
-                                                                                                             data_algo[
-                                                                                                                 'come_from'])
+            data_algo['frontier'], data_algo['inner'], data_algo['g_score'], data_algo['come_from'] = A_star(
+                self.curr_grid,
+                self.wall,
+                self.goal,
+                data_algo['h'],
+                data_algo['frontier'],
+                data_algo['inner'],
+                data_algo['g_score'],
+                data_algo['f_score'],
+                data_algo['come_from'])
         if algorithm is 'Dijkstra':
             data_algo['frontier'], data_algo['inner'], data_algo['g_score'], data_algo['come_from'] = Dijkstra(
-                curr_grid,
+                self.curr_grid,
                 self.wall, self.goal,
                 data_algo['frontier'],
                 data_algo['inner'],
                 data_algo['g_score'],
                 data_algo['come_from'])
         if algorithm is 'greed_best_first':
-            data_algo['frontier'], data_algo['inner'], data_algo['come_from'] = greed_best_first(curr_grid, self.wall,
+            data_algo['frontier'], data_algo['inner'], data_algo['come_from'] = greed_best_first(self.curr_grid,
+                                                                                                 self.wall,
                                                                                                  self.goal,
                                                                                                  data_algo['h'],
                                                                                                  data_algo['frontier'],
@@ -288,7 +371,7 @@ class world:
                                                                                                  data_algo['come_from'])
         if algorithm is 'Theta_star':
             data_algo['frontier'], data_algo['inner'], data_algo['g_score'], data_algo['come_from'] = Theta_star(
-                curr_grid,
+                self.curr_grid,
                 self.wall,
                 self.start,
                 self.goal,
@@ -304,31 +387,36 @@ class world:
             if algorithm is 'A_star_PS':
                 data_algo['come_from'] = post_smoothing(data_algo['come_from'], self.wall)
             for pos in data_algo['come_from']:
-                self.update_grid(curr_grid, 'path', pos)
+                self.update_grid('path', pos, clean_grid=False)
 
             self.paths.append([data_algo['come_from'], color])
             done = True
         else:
             for pos in data_algo['frontier']:
                 if (pos is not self.start) and (pos is not self.goal):
-                    self.update_grid(curr_grid, 'frontier', pos)
+                    self.update_grid('frontier', pos, clean_grid=False)
             for pos in data_algo['inner']:
                 if (pos is not self.start) and (pos is not self.goal):
-                    self.update_grid(curr_grid, 'inner', pos)
+                    self.update_grid('inner', pos, clean_grid=False)
 
-        return data_algo, curr_grid, done
+        return data_algo, done
 
-    def algorithm(self, screen, clean_grid, algorithm, color):
-        """
-        start, goal, wall = unpack_grid(clean_grid)
-        if start == -1:
-            return clean_grid
-        """
+    def algorithm(self, algorithm, color):
         if self.start is None or self.goal is None:
-            return clean_grid
+            self.curr_grid = self.clean_grid.copy()
+            return
+
+        self.reset_world('soft', new_run=True, keep_paths=True)
+
+        # avoid increment when algorithm is applied two times on the same world
+        if not self.applied_this_run[algorithm]:
+            self.algorithm_runs[algorithm] += 1
+        self.applied_this_run[algorithm] = True
+
+
         start = self.start
         goal = self.goal
-        h = heuristic(clean_grid, goal)
+        h = heuristic(self.clean_grid, goal)
         data_algo = {'h': h,
                      'frontier': {start},
                      'inner': set(),
@@ -337,44 +425,48 @@ class world:
                      'come_from': {start: None}}
         steps = 0
 
-        curr_grid = clean_grid.copy()
-        length = None
+        self.curr_grid = self.clean_grid.copy()
 
         while len(data_algo['frontier']) > 0:
+
             if self.step_by_step:
+
                 for event in pygame.event.get():
                     if event.type == pygame.KEYDOWN:
+
                         if event.type == pygame.QUIT:
                             sys.exit(0)
+
                         if event.key == self.control["R"]:
                             self.paths = []
-                            return clean_grid
+                            self.curr_grid = self.clean_grid
+                            return
+
                         # update only when SPACE is pressed
                         if event.type == pygame.KEYDOWN and event.key == self.control["SPACE"]:
-                            # apply one step of the selected algorithm
-                            data_algo, curr_grid, done = self.step(data_algo, algorithm, curr_grid, color)
-                            steps += 1
-                            if done:
-                                length = path_length(self.paths[-1][0])
-                                self.print_this = "[algo] {:19s} [steps] {:6s} [path length] {:5s}" \
-                                    .format(algorithm, str(steps), str(length))
-                                print(self.print_this)
-                                return curr_grid
-            else:
-                data_algo, curr_grid, done = self.step(data_algo, algorithm, curr_grid, color)
-                steps += 1
-                if done:
-                    length = path_length(self.paths[-1][0])
-                    self.print_this = "[algo] {:19s} [steps] {:6s} [path length] {:5s}" \
-                        .format(algorithm, str(steps), str(length))
-                    print(self.print_this)
-                    return curr_grid
 
-            self.caption = "{} {} {}".format(algorithm, steps, length)
-            pygame.display.set_caption(self.caption)
-            self.draw(curr_grid)
-            pygame.display.flip()
-            self.clock.tick(self.update_speed)
+                            # apply one step of the selected algorithm
+                            data_algo, done = self.step(data_algo, algorithm, color)
+                            steps += 1
+
+                            if done:
+                                self.print_this, self.printed_infos = \
+                                    build_print_line(algorithm, steps, self.paths, self.run_num, self.printed_infos)
+                                self.caption = self.print_this
+                                return
+
+            else:
+
+                data_algo, done = self.step(data_algo, algorithm, color)
+                steps += 1
+
+                if done:
+                    self.print_this, self.printed_infos = \
+                        build_print_line(algorithm, steps, self.paths, self.run_num, self.printed_infos)
+                    self.caption = self.print_this
+                    return
+
+            self.update_screen()
 
     def run(self):
         pygame.init()
@@ -385,7 +477,8 @@ class world:
         while repeat:
             self.start = None
             self.goal = None
-            grid = np.zeros([self.H, self.W], dtype=np.int8)
-            repeat = self.set_the_env(grid)
+            self.clean_grid = np.zeros([self.H, self.W], dtype=np.int8)
+            self.curr_grid = self.clean_grid
+            repeat = self.set_the_env()
 
         return 1
