@@ -117,3 +117,5 @@ After the A* solution is found, apply a post-smoothing in order to reduce the tu
 
 **Cost function**: f(n) = h(n) + g(n)
 
+
+
