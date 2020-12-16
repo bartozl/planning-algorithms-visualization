@@ -192,4 +192,9 @@ Otherwise (_i.e._ there is not a sight of view between _parent_curr_ and _m_) th
     Recap of 10 different runs
 </h3>
 
-<img src="https://i.postimg.cc/T1fqNFFK/results-10.png" width=350 />
+<p align="center">
+    <img src="https://i.postimg.cc/T1fqNFFK/results-10.png" width=350 />
+</p>
+
+
+
