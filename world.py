@@ -5,12 +5,12 @@ import numpy as np
 import pygame
 
 from algorithms import A_star, Dijkstra, greed_best_first, Theta_star
-from utils import heuristic, post_smoothing, build_print_line
+from utils import heuristic, post_smoothing, build_print_line, create_gif
 
 
 class world:
 
-    def __init__(self, height=20, width=20, margin=1, pixels=800, step_by_step=False, update_speed=45):
+    def __init__(self, height=20, width=20, margin=1, pixels=800, step_by_step=False, update_speed=45, gif=False):
 
         self.world_is_changed = True  # keep track of updates in start, goal or wall cells
         self.run_num = 0  # identify the run number
@@ -47,6 +47,7 @@ class world:
                       "GREEN": (35, 250, 44), "BLUE": (0, 0, 128), "LIGHTBLUE": (0, 0, 255),
                       "RED": (220, 0, 0), "LIGHTRED": (255, 100, 100), "PURPLE": (102, 0, 102),
                       "LIGHTPURPLE": (153, 0, 153), "BLACK": (0, 0, 0), "YELLOW": (245, 255, 137)}
+        self.gif = gif
 
     def update_grid(self, cell_type, pos, clean_grid=False):
         """
@@ -61,60 +62,65 @@ class world:
             grid = self.curr_grid
         x, y = pos  # pos = (x,y) = (h, w)
         value = None
-        if cell_type == 'clean':
-            value = 0
-            if grid[x][y] == 1:
-                self.start = None  # deleting a source
-                self.world_is_changed = True
-            elif grid[x][y] == 2:
-                self.wall = [cell for cell in self.wall if cell != (x, y)]
-                self.world_is_changed = True
-            elif grid[x][y] == 3:
-                self.goal = None  # deleting a goal
-                self.world_is_changed = True
 
-        elif cell_type == 'source':
-            if self.start is None and grid[x][y] not in [2, 3]:  # don't put a source on wall(2) or goal(3)
-                self.start = (x, y)
-                self.world_is_changed = True
-                value = 1
+        try:
+            if cell_type == 'clean':
+                value = 0
+                if grid[x][y] == 1:
+                    self.start = None  # deleting a source
+                    self.world_is_changed = True
+                elif grid[x][y] == 2:
+                    self.wall = [cell for cell in self.wall if cell != (x, y)]
+                    self.world_is_changed = True
+                elif grid[x][y] == 3:
+                    self.goal = None  # deleting a goal
+                    self.world_is_changed = True
 
-        elif cell_type == 'wall':
-            if grid[x][y] not in [1, 3]:  # don't put a wall on source(1) or goal(3)
-                self.wall.append((x, y))
-                self.world_is_changed = True
-                value = 2
+            elif cell_type == 'source':
+                if self.start is None and grid[x][y] not in [2, 3]:  # don't put a source on wall(2) or goal(3)
+                    self.start = (x, y)
+                    self.world_is_changed = True
+                    value = 1
 
-        elif cell_type == 'goal':
-            if self.goal is None and grid[x][y] not in [1, 2]:  # don't put a goal on source(1) or wall(2)
-                self.goal = (x, y)
-                self.world_is_changed = True
-                value = 3
+            elif cell_type == 'wall':
+                if grid[x][y] not in [1, 3]:  # don't put a wall on source(1) or goal(3)
+                    self.wall.append((x, y))
+                    self.world_is_changed = True
+                    value = 2
 
-        elif cell_type == 'frontier':
-            value = 4
-            if grid[x][y] == 1:
-                value = 1
-            if grid[x][y] == 3:
-                value = 3
+            elif cell_type == 'goal':
+                if self.goal is None and grid[x][y] not in [1, 2]:  # don't put a goal on source(1) or wall(2)
+                    self.goal = (x, y)
+                    self.world_is_changed = True
+                    value = 3
 
-        elif cell_type == 'inner':
-            value = 5
+            elif cell_type == 'frontier':
+                value = 4
+                if grid[x][y] == 1:
+                    value = 1
+                if grid[x][y] == 3:
+                    value = 3
 
-        elif cell_type == 'path':
-            value = 6
-            if grid[x][y] == 1:
-                value = 1
-            if grid[x][y] == 3:
-                value = 3
+            elif cell_type == 'inner':
+                value = 5
 
-        if cell_type is not None and value is not None:
-            grid[x][y] = value
+            elif cell_type == 'path':
+                value = 6
+                if grid[x][y] == 1:
+                    value = 1
+                if grid[x][y] == 3:
+                    value = 3
 
-        if clean_grid:
-            self.clean_grid = grid
-        else:
-            self.curr_grid = grid
+            if cell_type is not None and value is not None:
+                grid[x][y] = value
+
+            if clean_grid:
+                self.clean_grid = grid
+            else:
+                self.curr_grid = grid
+
+        except IndexError:
+            pass
 
     def draw(self):
         x, y = self.MARGIN, self.MARGIN
@@ -413,7 +419,6 @@ class world:
             self.algorithm_runs[algorithm] += 1
         self.applied_this_run[algorithm] = True
 
-
         start = self.start
         goal = self.goal
         h = heuristic(self.clean_grid, goal)
@@ -464,9 +469,18 @@ class world:
                     self.print_this, self.printed_infos = \
                         build_print_line(algorithm, steps, self.paths, self.run_num, self.printed_infos)
                     self.caption = self.print_this
+                    self.update_screen()
+                    if self.gif:
+                        pygame.image.save(self.screen, './temp/{}.bmp'.format(steps))
+                        create_gif(self.run_num, algorithm)
+
+
                     return
 
             self.update_screen()
+            if self.gif:
+                pygame.image.save(self.screen, './temp/{}.bmp'.format(steps))
+
 
     def run(self):
         pygame.init()

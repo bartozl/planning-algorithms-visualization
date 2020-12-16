@@ -1,5 +1,7 @@
 import numpy as np
-
+from PIL import Image
+import os
+import sys
 
 def reconstruct_path(curr, come_from):
     path = []
@@ -79,3 +81,39 @@ def build_print_line(algorithm, steps, paths, run_num, printed_infos):
         print(print_this)
     return print_this, printed_infos
     # self.caption = self.print_this
+
+
+def create_gif(run_name, algorithm):
+    images = []
+    sorted_list_dir = numerically_sorted(os.listdir("./temp"))
+    for img in sorted_list_dir:
+        img_path = os.getcwd() + '/temp/' + str(img) + '.bmp'
+        images.append(Image.open(img_path))
+        # add last image more time in order to visualize the final result
+        if img == len(sorted_list_dir):
+            for _ in range(50):
+                images.append(Image.open(img_path))
+        os.remove(img_path)
+
+    images[0].save('./{}_{}.gif'.format(run_name, algorithm),
+                   save_all=True,
+                   append_images=images[1:],
+                   duration=60,
+                   loop=0)
+
+'''
+https://ibb.co/Bj1wpc2  # A*
+https://ibb.co/r5YJy23  # A*_PS
+https://ibb.co/QnvPpNJ  # theta*
+https://ibb.co/7k1Nqy5  # GBF
+https://ibb.co/kgjJKcQ # Dijkstra
+'''
+def numerically_sorted(directory):
+    l = []
+    for file_name in directory:
+        try:
+            l.append(int(file_name.split('.')[0]))
+        except ValueError:
+            print('The /temp directory must contains only file in the format int.bpm')
+            sys.exit(1)
+    return sorted(l)
