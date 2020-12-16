@@ -78,11 +78,13 @@ python play.py
 
   
 
-  #### Dijkstra
+  <h3 align="center", >
+      Dijkstra
+  </h3>
 
-  <img src="https://i.postimg.cc/NMNS4G9J/1-Dijkstra.gif" width="300" align="center"/>
-
-  
+  <p align="center">
+      <img src="https://i.postimg.cc/NMNS4G9J/1-Dijkstra.gif" width="300" align="center"/>
+  </p>
 
   **Uninformed search**
 
@@ -92,9 +94,13 @@ python play.py
 
   
 
-  #### 														Greed Best First
+  <h3 align="center", >
+      Greed Best First
+  </h3>
 
-  <img src="https://i.postimg.cc/3R7Y6ww3/1-greed-best-first.gif" width="300" align="center"/>
+  <p align=center>
+      <img src="https://i.postimg.cc/3R7Y6ww3/1-greed-best-first.gif" width="300">
+  </p>
 
 **Informed search**
 
@@ -108,9 +114,13 @@ The expansion only depends on the heuristic: the algorithm selects the path that
 
 
 
-#### 																			A*
+<h3 align="center", >
+    A*
+</h3>
 
-<img src="https://i.postimg.cc/cJfdX30D/1-A-star.gif" width=300 align="center"/>
+<p align="center">
+    <img src="https://i.postimg.cc/cJfdX30D/1-A-star.gif" width=300 align="center"/>
+</p>
 
 **Informed search**
 
@@ -126,9 +136,13 @@ In each iteration, the **Frontier**'s node with the lowest f(n) is chosen a the 
 
 
 
-#### 															A* Post-Smoothing
+<h3 align="center", >
+    A* Post-smoothing
+</h3>
 
+<p align="center">
 <img src="https://i.postimg.cc/prLxW187/1-A-star-PS.gif" width="300" align="center"/>
+</p>
 
 **Informed search**
 
@@ -140,9 +154,13 @@ After the A* solution is found, apply a post-smoothing in order to reduce the tu
 
 
 
-#### 																		Theta*
+<h3 align="center", >
+    Theta*
+</h3>
 
-<img src="https://i.postimg.cc/Px4TkkLY/1-Theta-star.gif" width="300" align="center"/>
+<p align="center">
+    <img src="https://i.postimg.cc/Px4TkkLY/1-Theta-star.gif" width="300" align="center"/>
+</p>
 
 **Informed search**
 
@@ -160,9 +178,9 @@ Otherwise (_i.e._ there is not a sight of view between _parent_curr_ and _m_) th
 
 
 
-
-
-#### 								   Results for the example images
+<h3 align="center", >
+    Results from the previous gifs
+</h3>
 
 <p align="center">
     <img src="https://i.postimg.cc/7LkkCcDh/results.png" width="450" align=center/>
