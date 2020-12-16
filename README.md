@@ -110,7 +110,7 @@ The expansion only depends on the heuristic: the algorithm selects the path that
 
 #### 																			A*
 
-<img src="https://i.postimg.cc/Xq0Ftn03/1-A-star.gif" width=300/>
+<img src="https://i.postimg.cc/cJfdX30D/1-A-star.gif" width=300/>
 
 **Informed search**
 
