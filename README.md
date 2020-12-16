@@ -80,7 +80,7 @@ python play.py
 
   #### 																Dijkstra
 
-  [!alt text](https://ibb.co/Q9tkwqH)
+  ![alt text](https://ibb.co/Q9tkwqH)
 
   
 
