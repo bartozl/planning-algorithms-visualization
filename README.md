@@ -166,7 +166,7 @@ Otherwise (_i.e._ there is not a sight of view between _parent_curr_ and _m_) th
 
 <img src="https://i.postimg.cc/7LkkCcDh/results.png" width="450" align=center/>
 
-<p>
+</p>
 
 #### 					Results recap for 10 different runs (Q is pressed)
 
