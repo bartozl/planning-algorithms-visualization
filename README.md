@@ -70,6 +70,10 @@ python play.py
 
 #### Greed Best First
 
+![](https://ibb.co/7k1Nqy5)
+
+
+
 **Cost function**: f(n) = h(n)
 
 The expansion only depends on the heuristic: the algorithm selects the path that appears to be the best at the moment.
@@ -81,6 +85,9 @@ The expansion only depends on the heuristic: the algorithm selects the path that
 
 
 #### A*
+
+![](https://ibb.co/Bj1wpc2)
+
 **Cost function**: f(n) = h(n) + g(n)
 
 The expansion depends on the heuristic h(n) and the cost of the path from the starting node and the current node n (_i.e._ g(n)). The expansion is implemented as follow:
@@ -105,6 +112,8 @@ The expansion depends on the heuristic h(n) and the cost of the path from the st
 
 #### A* Post-Smoothing
 
+![](https://ibb.co/r5YJy23)
+
 After the A* solution is found, apply a post-smoothing in order to reduce the turns on the path by directly connecting nodes that are in the _sight of view_
 
 **Advantages**: Improve the results of A* in a grid world
@@ -115,7 +124,13 @@ After the A* solution is found, apply a post-smoothing in order to reduce the tu
 
 #### Theta*
 
+![](https://ibb.co/QnvPpNJ)
+
 **Cost function**: f(n) = h(n) + g(n)
+
+
+
+
 
 
 
