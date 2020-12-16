@@ -78,6 +78,18 @@ python play.py
 
   
 
+  #### 																Dijkstra
+
+  [!alt text](https://ibb.co/Q9tkwqH)
+
+  
+
+  **Uninformed search**
+
+  **Cost function**: f(n) = g(n)
+
+  Since there is no information about the world, the expansion considers only the distance from the START node.
+
   
 
   #### 														Greed Best First
@@ -124,7 +136,7 @@ After the A* solution is found, apply a post-smoothing in order to reduce the tu
 
 **Advantages**: Improve the results of A* in a grid world
 
-**Drawbacks**: The solutions is not necessary the best possible one.
+**Drawbacks**: The solution is not guaranteed to be optimal one.
 
 
 
@@ -142,6 +154,12 @@ new_g(m) = sum(g_score(_parent_curr_), dist(_parent_curr,_ _m_))
 
 Otherwise (_i.e._ there is not a sight of view between _parent_curr_ and _m_) the g(m) update follows the standard procedure.
 
-**Advantages**: the smoothing procedure is embedded in the expansion process.
+**Advantages**: the smoothing procedure is embedded in the expansion process --> no post-smoothing phase.
 
-**Drawbacks**: 
+**Drawbacks**: the solution is not guaranteed to be optimal one.
+
+
+
+#### 								Results for the example images
+
+<img src="/home/lorenzo/Pictures/results.png" alt="results" style="zoom:70%;" />
