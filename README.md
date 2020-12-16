@@ -61,16 +61,30 @@ python play.py
 
 * **Informed search**: a cost estimation for reaching the goal from the current node is made by an heuristic function.
 
-* **Heuristic Function h(n)**: The quality of the heuristics affects these kinds of algorithms; the main  requirements for a good heuristic are **admissibility** (never overestimate the cost) and **consistency** (_h(goal) = 0 and h(n) <= (dist(n, p) + h(p)_), where p in neighbor(n)). 
+* **h(n)** is the **heuristic function**: The quality of the heuristics affects these kinds of algorithms; the main  requirements for a good heuristic are **admissibility** (never overestimate the cost) and **consistency** (_h(goal) = 0 and h(n) <= (dist(n, p) + h(p)_), where p in neighborhood(n)). 
   In a path-planning problem, the Euclidean distance from the goal always represents an admissible and consistent heuristic.
 
-* **Cost Function f(n)**: the next node to be expanded is chosen in order to minimize this function.
+* **g(n)** is the **distance from the START to the node n**. It is initialized as 0 for the start node, and Inf for the others. Then, when from the node _curr_ we are visiting a neighbor node _m_, the new g(m) is computed as sum(g(curr), dist(curr, m))
+  
+* **f(n)** is the **cost function**: the next node to be expanded is chosen in order to minimize this function.
+
+* **Frontier** nodes (open set) = candidate nodes for the expansion in the next step (yellow cells in the animation)
+
+* **Inner** nodes (closed set) = already visited nodes  (gray cells in the animation)
+
+* **Unexplored** nodes are white in the animation
+
+* **neighborhood(n)** = set of cells directly reachable from the n nodes.
 
   
 
-#### Greed Best First
+  
+
+  #### 														Greed Best First
 
 <img src="/home/lorenzo/university/projects/planning-algorithms-visualization/1_greed_best_first.gif" alt="1_greed_best_first" style="zoom:50%;" />
+
+**Informed search**
 
 **Cost function**: f(n) = h(n)
 
@@ -82,25 +96,17 @@ The expansion only depends on the heuristic: the algorithm selects the path that
 
 
 
-#### A*
+#### 																			A*
 
 <img src="/home/lorenzo/university/projects/planning-algorithms-visualization/1_A_star.gif" alt="1_A_star" style="zoom:50%;" />
 
+**Informed search**
+
 **Cost function**: f(n) = h(n) + g(n)
 
-The expansion depends on the heuristic h(n) and the cost of the path from the starting node and the current node n (_i.e._ g(n)). The expansion is implemented as follow:
+The expansion depends on the heuristic h(n) and the cost of the path from the starting node (START) and the current node n (_i.e._ g(n)). The expansion is implemented as follow:
 
-- **Frontier** nodes (open set) = candidate nodes for the expansion in the next step (yellow cells in the animation)
-
-- **Inner** nodes (closed set) = already visited nodes  (gray cells in the animation)
-
-- **Unexplored** nodes are white in the animation
-
-  In each iteration, the frontier's node with the lowest f(n) is chosen a the current node _curr_. If it is the goal, the algorithm terminates. Otherwise, the node is removed from the Frontier and added to the Inner set. For each _m_ in neighbor(_curr_), if _m_ is not an Inner node, the new g_new(_m_) value is computed and if it is lower then the previous one, f(m) is updated.
-
-  Note: g_new(_m_) = g(_curr_) + dist(_curr_, _m_)
-
-  If g_new(_m_) < g_prev(_m_) it means that a shorter path from start to _m_ has been found.
+In each iteration, the **Frontier**'s node with the lowest f(n) is chosen a the current node _curr_. If it is the goal, the algorithm terminates. Otherwise, the node is removed from the Frontier and added to the Inner set. For each _m_ in neighborhood(_curr_), if _m_ is not an **Inner** node, the new **g score** for _m_ is computed (see keywords sec.) If **g_new(_m_)** it is lower then g(m), it mean that a shorter path from START and m has been found; then, f(m) is updated accordingly and the _m_ node is added to the frontier set.
 
 **Advantages**: Optimal solution for admissible heuristics.
 
@@ -108,9 +114,11 @@ The expansion depends on the heuristic h(n) and the cost of the path from the st
 
 
 
-#### A* Post-Smoothing
+#### 															A* Post-Smoothing
 
 <img src="/home/lorenzo/university/projects/planning-algorithms-visualization/1_A_star_PS.gif" alt="1_A_star_PS" style="zoom:50%;" />
+
+**Informed search**
 
 After the A* solution is found, apply a post-smoothing in order to reduce the turns on the path by directly connecting nodes that are in the _sight of view_
 
@@ -120,9 +128,20 @@ After the A* solution is found, apply a post-smoothing in order to reduce the tu
 
 
 
-#### Theta*
+#### 																		Theta*
 
 <img src="/home/lorenzo/university/projects/planning-algorithms-visualization/1_Theta_star.gif" alt="1_Theta_star" style="zoom:50%;" />
 
+**Informed search**
+
 **Cost function**: f(n) = h(n) + g(n)
 
+The expansion is similar to A*, but in order to find smoother paths, the **g(m)** computation is different. Instead of computing new_g(m) as sum(g(curr), dist(curr, m)), we first check if _parent_curr_ (the node that connect the _curr_ node with the previous) is in **sight of view** with _m_. This would mean that the _m_ node is reachable also from the _parent_curr_ node, making useless the intermediate walk through _curr_. So, if this connection is possible, new_g(m) is computed as:
+
+new_g(m) = sum(g_score(_parent_curr_), dist(_parent_curr,_ _m_))
+
+Otherwise (_i.e._ there is not a sight of view between _parent_curr_ and _m_) the g(m) update follows the standard procedure.
+
+**Advantages**: the smoothing procedure is embedded in the expansion process.
+
+**Drawbacks**: 
