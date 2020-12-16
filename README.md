@@ -80,7 +80,7 @@ python play.py
 
   #### 																Dijkstra
 
-  <img src="https://i.postimg.cc/zvjLMWjS/1-Dijkstra.gif" width="300" height="300"/>
+  <img src="https://i.postimg.cc/NMNS4G9J/1-Dijkstra.gif" width="300" />
 
   
 
@@ -94,7 +94,7 @@ python play.py
 
   #### 														Greed Best First
 
-  <img src="https://i.postimg.cc/gcv38Lv0/1-greed-best-first.gif" width="300" height="300"/>
+  <img src="https://i.postimg.cc/3R7Y6ww3/1-greed-best-first.gif" width="300"/>
 
 **Informed search**
 
@@ -110,7 +110,7 @@ The expansion only depends on the heuristic: the algorithm selects the path that
 
 #### 																			A*
 
-<img src="https://i.postimg.cc/cJfdX30D/1-A-star.gif" width=300/>
+<img src="https://i.postimg.cc/cJfdX30D/1-A-star.gif" width=200/>
 
 **Informed search**
 
@@ -128,7 +128,7 @@ In each iteration, the **Frontier**'s node with the lowest f(n) is chosen a the 
 
 #### 															A* Post-Smoothing
 
-<img src="https://i.postimg.cc/fRgdDch8/1-A-star-PS.gif" width="300" height="300"/>
+<img src="https://i.postimg.cc/prLxW187/1-A-star-PS.gif" width="300"/>
 
 **Informed search**
 
@@ -142,7 +142,7 @@ After the A* solution is found, apply a post-smoothing in order to reduce the tu
 
 #### 																		Theta*
 
-<img src="https://i.postimg.cc/Xq0Ftn03/1-A-star.gif" width="300" height="300"/>
+<img src="https://i.postimg.cc/Px4TkkLY/1-Theta-star.gif" width="300" />
 
 **Informed search**
 
