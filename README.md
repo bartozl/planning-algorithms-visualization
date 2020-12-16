@@ -80,7 +80,7 @@ python play.py
 
   #### 																Dijkstra
 
-  <img src="https://i.postimg.cc/zvjLMWjS/1-Dijkstra.gif" alt="alt text" style="zoom:50%;" />
+  <img src="https://i.postimg.cc/zvjLMWjS/1-Dijkstra.gif" width="300" height="300"/>
 
   
 
@@ -94,7 +94,7 @@ python play.py
 
   #### 														Greed Best First
 
-<img src="https://i.postimg.cc/gcv38Lv0/1-greed-best-first.gif" alt="alt text" style="zoom:50%;" />
+  <img src="https://i.postimg.cc/gcv38Lv0/1-greed-best-first.gif" width="300" height="300"/>
 
 **Informed search**
 
@@ -110,7 +110,7 @@ The expansion only depends on the heuristic: the algorithm selects the path that
 
 #### 																			A*
 
-<img src="https://i.postimg.cc/gcv38Lv0/1-greed-best-first.gif" alt="alt text" style="zoom:50%;" />
+<img src="https://i.postimg.cc/Xq0Ftn03/1-A-star.gif" width="300" height="300"/>
 
 **Informed search**
 
@@ -128,7 +128,7 @@ In each iteration, the **Frontier**'s node with the lowest f(n) is chosen a the 
 
 #### 															A* Post-Smoothing
 
-<img src="https://i.postimg.cc/fRgdDch8/1-A-star-PS.gif" alt="alt text" style="zoom:50%;" />
+<img src="https://i.postimg.cc/fRgdDch8/1-A-star-PS.gif" width="300" height="300"/>
 
 **Informed search**
 
@@ -142,7 +142,7 @@ After the A* solution is found, apply a post-smoothing in order to reduce the tu
 
 #### 																		Theta*
 
-<img src="https://i.postimg.cc/pXC81Ncb/1-Theta-star.gif" alt="alt text" style="zoom:50%;" />
+<img src="https://i.postimg.cc/Xq0Ftn03/1-A-star.gif" width="300" height="300"/>
 
 **Informed search**
 
@@ -162,7 +162,7 @@ Otherwise (_i.e._ there is not a sight of view between _parent_curr_ and _m_) th
 
 #### 								   Results for the example images
 
-<img src="https://i.postimg.cc/7LkkCcDh/results.png" alt="alt text" style="zoom:70%;" />
+<img src="https://i.postimg.cc/7LkkCcDh/results.png" width="450" height="150"/>
 
 
 
