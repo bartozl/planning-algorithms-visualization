@@ -183,10 +183,13 @@ Otherwise (_i.e._ there is not a sight of view between _parent_curr_ and _m_) th
 </h3>
 
 <p align="center">
-    <img src="https://i.postimg.cc/7LkkCcDh/results.png" width="450" align=center/>
+    <img src="https://i.postimg.cc/7LkkCcDh/results.png" width="500" align=center/>
 </p>
 
 
 
-#### 					Results recap for 10 different runs (Q is pressed)
+<h3 align="center">
+    Recap of 10 different runs
+</h3>
 
+<img src="https://i.postimg.cc/T1fqNFFK/results-10.png" width=350 />
