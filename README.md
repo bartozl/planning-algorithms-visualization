@@ -43,7 +43,7 @@ python play.py
   - CTRL + mouse movement: delete a cell
 
   -  R: reset the world keeping the source, the goal and the walls
-  - Q: reset the world completely
+  - Q: reset the world completely and print a recap of all the previous runs
   - S: take a screen-shot of the world
   - D: execute Dijkstra algorithm
   - G: execute Greed Best First algorithm
@@ -80,7 +80,7 @@ python play.py
 
   #### 																Dijkstra
 
-  ![alt text](https://ibb.co/Q9tkwqH)
+  <img src="https://i.postimg.cc/zvjLMWjS/1-Dijkstra.gif" alt="alt text" style="zoom:50%;" />
 
   
 
@@ -94,7 +94,7 @@ python play.py
 
   #### 														Greed Best First
 
-<img src="/home/lorenzo/university/projects/planning-algorithms-visualization/1_greed_best_first.gif" alt="1_greed_best_first" style="zoom:50%;" />
+<img src="https://i.postimg.cc/gcv38Lv0/1-greed-best-first.gif" alt="alt text" style="zoom:50%;" />
 
 **Informed search**
 
@@ -110,7 +110,7 @@ The expansion only depends on the heuristic: the algorithm selects the path that
 
 #### 																			A*
 
-<img src="/home/lorenzo/university/projects/planning-algorithms-visualization/1_A_star.gif" alt="1_A_star" style="zoom:50%;" />
+<img src="https://i.postimg.cc/gcv38Lv0/1-greed-best-first.gif" alt="alt text" style="zoom:50%;" />
 
 **Informed search**
 
@@ -128,7 +128,7 @@ In each iteration, the **Frontier**'s node with the lowest f(n) is chosen a the 
 
 #### 															A* Post-Smoothing
 
-<img src="/home/lorenzo/university/projects/planning-algorithms-visualization/1_A_star_PS.gif" alt="1_A_star_PS" style="zoom:50%;" />
+<img src="https://i.postimg.cc/fRgdDch8/1-A-star-PS.gif" alt="alt text" style="zoom:50%;" />
 
 **Informed search**
 
@@ -142,7 +142,7 @@ After the A* solution is found, apply a post-smoothing in order to reduce the tu
 
 #### 																		Theta*
 
-<img src="/home/lorenzo/university/projects/planning-algorithms-visualization/1_Theta_star.gif" alt="1_Theta_star" style="zoom:50%;" />
+<img src="https://i.postimg.cc/pXC81Ncb/1-Theta-star.gif" alt="alt text" style="zoom:50%;" />
 
 **Informed search**
 
@@ -160,6 +160,11 @@ Otherwise (_i.e._ there is not a sight of view between _parent_curr_ and _m_) th
 
 
 
-#### 								Results for the example images
+#### 								   Results for the example images
 
-<img src="/home/lorenzo/Pictures/results.png" alt="results" style="zoom:70%;" />
+<img src="https://i.postimg.cc/7LkkCcDh/results.png" alt="alt text" style="zoom:70%;" />
+
+
+
+#### 					Results recap for 10 different runs (Q is pressed)
+
