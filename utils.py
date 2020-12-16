@@ -101,13 +101,7 @@ def create_gif(run_name, algorithm):
                    duration=60,
                    loop=0)
 
-'''
-https://ibb.co/Bj1wpc2  # A*
-https://ibb.co/r5YJy23  # A*_PS
-https://ibb.co/QnvPpNJ  # theta*
-https://ibb.co/7k1Nqy5  # GBF
-https://ibb.co/kgjJKcQ # Dijkstra
-'''
+
 def numerically_sorted(directory):
     l = []
     for file_name in directory:

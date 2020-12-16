@@ -70,9 +70,7 @@ python play.py
 
 #### Greed Best First
 
-![](https://ibb.co/7k1Nqy5)
-
-
+<img src="/home/lorenzo/university/projects/planning-algorithms-visualization/1_greed_best_first.gif" alt="1_greed_best_first" style="zoom:50%;" />
 
 **Cost function**: f(n) = h(n)
 
@@ -86,7 +84,7 @@ The expansion only depends on the heuristic: the algorithm selects the path that
 
 #### A*
 
-![](https://ibb.co/Bj1wpc2)
+<img src="/home/lorenzo/university/projects/planning-algorithms-visualization/1_A_star.gif" alt="1_A_star" style="zoom:50%;" />
 
 **Cost function**: f(n) = h(n) + g(n)
 
@@ -112,7 +110,7 @@ The expansion depends on the heuristic h(n) and the cost of the path from the st
 
 #### A* Post-Smoothing
 
-![](https://ibb.co/r5YJy23)
+<img src="/home/lorenzo/university/projects/planning-algorithms-visualization/1_A_star_PS.gif" alt="1_A_star_PS" style="zoom:50%;" />
 
 After the A* solution is found, apply a post-smoothing in order to reduce the turns on the path by directly connecting nodes that are in the _sight of view_
 
@@ -124,13 +122,7 @@ After the A* solution is found, apply a post-smoothing in order to reduce the tu
 
 #### Theta*
 
-![](https://ibb.co/QnvPpNJ)
+<img src="/home/lorenzo/university/projects/planning-algorithms-visualization/1_Theta_star.gif" alt="1_Theta_star" style="zoom:50%;" />
 
 **Cost function**: f(n) = h(n) + g(n)
-
-
-
-
-
-
 
