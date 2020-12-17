@@ -170,5 +170,3 @@ def Theta_star(grid, wall, start, goal, h, frontier, inner, g_score, f_score, co
 	return frontier, inner, g_score, come_from
 
 
-
-

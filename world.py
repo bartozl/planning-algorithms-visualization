@@ -481,7 +481,6 @@ class world:
             if self.gif:
                 pygame.image.save(self.screen, './temp/{}.bmp'.format(steps))
 
-
     def run(self):
         pygame.init()
         self.screen = pygame.display.set_mode(self.WINDOW_SIZE)
