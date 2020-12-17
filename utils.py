@@ -3,6 +3,7 @@ from PIL import Image
 import os
 import sys
 
+
 def reconstruct_path(curr, come_from):
     path = []
     while curr is not None:
