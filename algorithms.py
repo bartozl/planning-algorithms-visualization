@@ -10,7 +10,7 @@ def Dijkstra(grid, wall, goal, frontier, inner, g_score, come_from):
 		if g_score[node] < g_score[curr]:
 			curr = node
 
-	# check if it is the goal
+	# check if it is the  goal
 	if curr == goal:
 		path = reconstruct_path(curr, come_from)
 		return None, None, None, path
